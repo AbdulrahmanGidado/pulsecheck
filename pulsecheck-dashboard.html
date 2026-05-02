@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PulseCheck — Customer Feedback Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ── TOKENS ── */
+:root{
+  --bg:       #09090b;
+  --surface:  #111113;
+  --s2:       #18181b;
+  --s3:       #1f1f23;
+  --border:   #27272a;
+  --border2:  #3f3f46;
+  --text:     #fafafa;
+  --t2:       #a1a1aa;
+  --t3:       #52525b;
+  --t4:       #3f3f46;
+  --green:    #22c55e;
+  --green-d:  #166534;
+  --green-bg: #052e16;
+  --red:      #ef4444;
+  --red-d:    #991b1b;
+  --red-bg:   #2d0a0a;
+  --yellow:   #eab308;
+  --yellow-bg:#1c1a02;
+  --yellow-d: #854d0e;
+  --blue:     #3b82f6;
+  --blue-bg:  #0c1829;
+  --purple:   #a855f7;
+  --purple-bg:#1a0b29;
+  --r-sm:     6px;
+  --r-md:     10px;
+  --r-lg:     14px;
+  --r-xl:     18px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{
+  font-family:'Geist',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  height:100vh;
+  display:flex;
+  overflow:hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:220px;
+  flex-shrink:0;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  padding:0;
+  height:100vh;
+  overflow:hidden;
+}
+.sb-logo{
+  padding:20px 18px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.logo-mark{
+  width:28px;height:28px;
+  background:linear-gradient(135deg,#3b82f6,#a855f7);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#fff;
+  flex-shrink:0;
+}
+.logo-text{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.02em}
+.logo-sub{font-size:10px;color:var(--t3);margin-top:1px}
+
+.sb-section{
+  padding:12px 10px 4px;
+  font-size:10px;font-weight:500;
+  color:var(--t3);letter-spacing:.08em;text-transform:uppercase;
+}
+.sb-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;
+  border-radius:var(--r-sm);
+  margin:1px 8px;
+  font-size:13px;font-weight:500;color:var(--t2);
+  cursor:pointer;transition:all .15s;
+  border:none;background:none;
+  font-family:'Geist',sans-serif;
+  width:calc(100% - 16px);text-align:left;
+}
+.sb-item:hover{background:var(--s2);color:var(--text)}
+.sb-item.active{background:var(--s3);color:var(--text)}
+.sb-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.sb-badge{
+  margin-left:auto;
+  background:var(--s3);
+  border:1px solid var(--border);
+  font-size:10px;color:var(--t2);
+  padding:1px 6px;border-radius:20px;
+  font-family:'Geist Mono',monospace;
+}
+
+.sb-bottom{
+  margin-top:auto;
+  padding:12px;
+  border-top:1px solid var(--border);
+}
+.sb-workspace{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;border-radius:var(--r-sm);
+  background:var(--s2);cursor:pointer;
+}
+.ws-avatar{
+  width:24px;height:24px;border-radius:6px;
+  background:linear-gradient(135deg,#3b82f6,#a855f7);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.ws-name{font-size:12px;font-weight:500;color:var(--text)}
+.ws-plan{font-size:10px;color:var(--t3)}
+
+/* ── MAIN ── */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+
+/* ── TOP BAR ── */
+.topbar{
+  height:53px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 24px;
+  gap:16px;
+  flex-shrink:0;
+  background:var(--surface);
+}
+.topbar-title{font-size:14px;font-weight:600;color:var(--text)}
+.topbar-sep{color:var(--border2)}
+.topbar-sub{font-size:13px;color:var(--t2)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-badge{
+  font-size:11px;padding:4px 10px;border-radius:20px;
+  background:var(--green-bg);color:var(--green);
+  border:1px solid var(--green-d);
+  font-family:'Geist Mono',monospace;
+  display:flex;align-items:center;gap:5px;
+}
+.tb-badge::before{
+  content:'';width:6px;height:6px;
+  border-radius:50%;background:var(--green);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.tb-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 12px;
+  background:var(--text);color:var(--bg);
+  border:none;border-radius:var(--r-sm);
+  font-size:12px;font-weight:600;
+  cursor:pointer;font-family:'Geist',sans-serif;
+  transition:opacity .15s;
+}
+.tb-btn:hover{opacity:.88}
+
+/* ── CONTENT AREA ── */
+.content{flex:1;overflow-y:auto;padding:24px}
+.page{display:none}
+.page.active{display:block}
+
+/* ── STAT CARDS ── */
+.stats-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:12px;margin-bottom:24px;
+}
+.stat-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+  padding:16px 18px;
+}
+.sc-label{font-size:11px;color:var(--t3);font-weight:500;margin-bottom:10px;letter-spacing:.03em}
+.sc-val{font-size:26px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin-bottom:4px}
+.sc-delta{
+  font-size:11px;display:flex;align-items:center;gap:4px;
+  font-family:'Geist Mono',monospace;
+}
+.delta-up{color:var(--green)}
+.delta-dn{color:var(--red)}
+.delta-neutral{color:var(--t3)}
+
+/* ── SECTION HEADER ── */
+.sec-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.sec-title{font-size:13px;font-weight:600;color:var(--text)}
+.sec-link{font-size:12px;color:var(--t3);cursor:pointer;transition:color .15s;background:none;border:none;font-family:'Geist',sans-serif}
+.sec-link:hover{color:var(--text)}
+
+/* ── TWO-COL LAYOUT ── */
+.two-col{display:grid;grid-template-columns:1fr 360px;gap:16px;margin-bottom:24px}
+
+/* ── FEED ── */
+.feed{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+  overflow:hidden;
+}
+.feed-header{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 18px;
+  border-bottom:1px solid var(--border);
+}
+.feed-title{font-size:13px;font-weight:600;color:var(--text)}
+.feed-ct{
+  margin-left:auto;font-size:11px;color:var(--t3);
+  font-family:'Geist Mono',monospace;
+}
+.feed-body{max-height:340px;overflow-y:auto}
+.feed-item{
+  padding:14px 18px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  transition:background .1s;
+}
+.feed-item:last-child{border-bottom:none}
+.feed-item:hover{background:var(--s2)}
+.fi-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+.fi-text{font-size:13px;color:var(--t2);line-height:1.5;flex:1}
+.sent-pill{
+  flex-shrink:0;
+  font-size:10px;font-weight:500;
+  padding:3px 8px;border-radius:20px;
+  font-family:'Geist Mono',monospace;
+  border:1px solid;
+  white-space:nowrap;
+}
+.sp-pos{background:var(--green-bg);color:var(--green);border-color:var(--green-d)}
+.sp-neg{background:var(--red-bg);color:var(--red);border-color:var(--red-d)}
+.sp-neu{background:var(--s3);color:var(--t2);border-color:var(--border2)}
+.fi-meta{display:flex;align-items:center;gap:8px}
+.fi-source{font-size:10px;color:var(--t4)}
+.fi-conf{font-size:10px;color:var(--t4);font-family:'Geist Mono',monospace}
+.fi-time{font-size:10px;color:var(--t4);margin-left:auto}
+
+/* ── DONUT ── */
+.donut-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+  padding:20px;
+}
+.donut-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:20px}
+.donut-wrap{display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.donut-legend{display:flex;flex-direction:column;gap:10px}
+.dl-item{display:flex;align-items:center;gap:10px}
+.dl-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.dl-label{font-size:12px;color:var(--t2);flex:1}
+.dl-val{font-size:12px;font-weight:600;color:var(--text);font-family:'Geist Mono',monospace}
+.dl-pct{font-size:11px;color:var(--t3);font-family:'Geist Mono',monospace;width:32px;text-align:right}
+
+/* ── TREND BARS ── */
+.trend-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+  padding:20px;
+  margin-bottom:16px;
+}
+.trend-bars{display:flex;align-items:flex-end;gap:6px;height:80px;margin-top:16px}
+.t-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.t-bar{width:100%;border-radius:3px 3px 0 0;transition:height .4s ease;min-height:3px}
+.t-label{font-size:9px;color:var(--t3);font-family:'Geist Mono',monospace}
+
+/* ── ANALYZE PAGE ── */
+.analyze-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.analyze-left{}
+.input-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+  overflow:hidden;
+  margin-bottom:12px;
+  transition:border-color .2s;
+}
+.input-box:focus-within{border-color:var(--blue)}
+.ib-header{
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+  background:var(--s2);
+}
+.ib-title{font-size:12px;font-weight:500;color:var(--t2)}
+.ib-source{
+  margin-left:auto;
+  background:var(--s3);border:1px solid var(--border);
+  border-radius:var(--r-sm);font-size:11px;color:var(--t2);
+  padding:3px 8px;cursor:pointer;
+  font-family:'Geist',sans-serif;
+}
+textarea{
+  width:100%;min-height:130px;padding:14px 16px;
+  background:transparent;border:none;outline:none;
+  color:var(--text);font-family:'Geist',sans-serif;
+  font-size:13px;line-height:1.7;resize:none;
+  caret-color:var(--blue);
+}
+textarea::placeholder{color:var(--t4)}
+.ib-footer{
+  padding:10px 14px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+  background:var(--s2);
+}
+.char-ct{font-size:11px;color:var(--t4);font-family:'Geist Mono',monospace}
+.analyze-btn{
+  margin-left:auto;
+  display:flex;align-items:center;gap:6px;
+  padding:6px 14px;
+  background:var(--blue);color:#fff;
+  border:none;border-radius:var(--r-sm);
+  font-size:12px;font-weight:600;
+  cursor:pointer;font-family:'Geist',sans-serif;
+  transition:opacity .15s;
+}
+.analyze-btn:hover{opacity:.88}
+.analyze-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* mode selector */
+.mode-sel{
+  display:flex;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+  padding:4px;
+  margin-bottom:12px;
+}
+.ms-opt{
+  flex:1;padding:7px 10px;border-radius:var(--r-sm);
+  border:none;background:transparent;
+  font-family:'Geist',sans-serif;font-size:12px;font-weight:500;
+  color:var(--t3);cursor:pointer;transition:all .15s;
+}
+.ms-opt.active{background:var(--s3);color:var(--text)}
+.ms-opt:hover:not(.active){color:var(--t2)}
+
+/* examples */
+.ex-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.ex-tag{
+  font-size:11px;padding:5px 10px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r-sm);color:var(--t3);
+  cursor:pointer;font-family:'Geist',sans-serif;
+  transition:all .15s;
+  max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.ex-tag:hover{border-color:var(--border2);color:var(--t2)}
+
+/* result card */
+.result-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+  overflow:hidden;
+  animation:fadeIn .3s ease both;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.rb-head{
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  background:var(--s2);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.rb-label{font-size:11px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.rb-model{
+  font-size:10px;padding:3px 8px;border-radius:20px;
+  font-family:'Geist Mono',monospace;border:1px solid;
+}
+.rbm-fast{background:rgba(234,179,8,.08);color:var(--yellow);border-color:var(--yellow-d)}
+.rbm-smart{background:var(--blue-bg);color:var(--blue);border-color:#1e3a5f}
+.rb-body{padding:16px}
+
+.big-sent{
+  display:flex;align-items:center;gap:14px;margin-bottom:16px;
+}
+.sent-ico{
+  width:48px;height:48px;border-radius:var(--r-md);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.si-pos{background:var(--green-bg)}
+.si-neg{background:var(--red-bg)}
+.si-neu{background:var(--s3)}
+.sent-label{
+  font-size:24px;font-weight:700;letter-spacing:-.02em;
+}
+.sl-pos{color:var(--green)}
+.sl-neg{color:var(--red)}
+.sl-neu{color:var(--t2)}
+.sent-pct{font-size:12px;color:var(--t3);font-family:'Geist Mono',monospace;margin-top:2px}
+
+.bar-row{margin-bottom:14px}
+.bar-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-bottom:5px;font-family:'Geist Mono',monospace}
+.bar-track{height:5px;border-radius:3px;background:var(--s3);overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.bf-pos{background:var(--green)}
+.bf-neg{background:var(--red)}
+.bf-neu{background:var(--border2)}
+
+.reason{
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:10px 12px;
+  font-size:12px;color:var(--t2);line-height:1.7;
+}
+.reason b{color:var(--t2);font-weight:600}
+
+/* compare */
+.cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.disagree-banner{
+  margin-top:10px;
+  padding:10px 14px;
+  background:rgba(168,85,247,.06);
+  border:1px solid rgba(168,85,247,.2);
+  border-radius:var(--r-sm);
+  font-size:12px;color:#c084fc;line-height:1.6;
+}
+.disagree-banner b{color:#d8b4fe;font-weight:600}
+
+/* accuracy note */
+.acc-note{
+  margin-top:10px;
+  padding:10px 14px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r-sm);
+  font-size:11px;color:var(--t3);line-height:1.6;
+}
+.acc-note b{color:var(--t2);font-weight:500}
+
+/* ── SPINNER ── */
+.spin{
+  display:inline-block;width:12px;height:12px;
+  border:2px solid rgba(255,255,255,.3);border-top-color:#fff;
+  border-radius:50%;animation:spin .6s linear infinite;
+  vertical-align:middle;margin-right:6px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── EMPTY STATE ── */
+.empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:48px 24px;text-align:center;color:var(--t4);
+}
+.empty-icon{font-size:32px;margin-bottom:12px;opacity:.5}
+.empty-text{font-size:13px;line-height:1.6}
+
+/* ── EMBED PAGE ── */
+.embed-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:20px;margin-bottom:16px;
+}
+.embed-card h3{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
+.embed-card p{font-size:12px;color:var(--t2);line-height:1.7;margin-bottom:14px}
+.code-block{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:14px 16px;
+  font-family:'Geist Mono',monospace;font-size:11px;
+  color:#a78bfa;line-height:1.8;
+  white-space:pre;overflow-x:auto;
+}
+.copy-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:10px;padding:6px 12px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r-sm);font-size:11px;color:var(--t2);
+  cursor:pointer;font-family:'Geist',sans-serif;
+  transition:all .15s;
+}
+.copy-btn:hover{border-color:var(--border2);color:var(--text)}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="logo-mark">P</div>
+    <div>
+      <div class="logo-text">PulseCheck</div>
+      <div class="logo-sub">Feedback Intelligence</div>
+    </div>
+  </div>
+
+  <div class="sb-section">Main</div>
+  <button class="sb-item active" onclick="nav('overview')">
+    <span class="sb-icon">▦</span> Overview
+  </button>
+  <button class="sb-item" onclick="nav('reviews')">
+    <span class="sb-icon">◈</span> Reviews
+    <span class="sb-badge" id="sb-ct">0</span>
+  </button>
+  <button class="sb-item" onclick="nav('analyze')">
+    <span class="sb-icon">⊙</span> Analyze
+  </button>
+
+  <div class="sb-section">Settings</div>
+  <button class="sb-item" onclick="nav('embed')">
+    <span class="sb-icon">⟨⟩</span> Embed Widget
+  </button>
+
+  <div class="sb-bottom">
+    <div class="sb-workspace">
+      <div class="ws-avatar">A</div>
+      <div>
+        <div class="ws-name">Acme Corp</div>
+        <div class="ws-plan">Pro plan</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <span class="topbar-title" id="tb-title">Overview</span>
+    <span class="topbar-sep">/</span>
+    <span class="topbar-sub" id="tb-sub">Last 7 days</span>
+    <div class="topbar-right">
+      <div class="tb-badge">Live</div>
+      <button class="tb-btn" onclick="nav('analyze')">+ Analyze Text</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ── OVERVIEW ── -->
+    <div class="page active" id="page-overview">
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="sc-label">Total Reviews</div>
+          <div class="sc-val" id="s-total">0</div>
+          <div class="sc-delta delta-up" id="s-total-d">↑ 0 this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Positive</div>
+          <div class="sc-val" style="color:var(--green)" id="s-pos">0%</div>
+          <div class="sc-delta" id="s-pos-d"></div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Negative</div>
+          <div class="sc-val" style="color:var(--red)" id="s-neg">0%</div>
+          <div class="sc-delta" id="s-neg-d"></div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Avg. Confidence</div>
+          <div class="sc-val" id="s-conf">0%</div>
+          <div class="sc-delta delta-neutral">model certainty</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Feed -->
+        <div>
+          <div class="sec-head">
+            <div class="sec-title">Recent Feedback</div>
+            <button class="sec-link" onclick="nav('reviews')">View all →</button>
+          </div>
+          <div class="feed">
+            <div class="feed-header">
+              <span class="feed-title">Live stream</span>
+              <span class="feed-ct" id="feed-ct">0 entries</span>
+            </div>
+            <div class="feed-body" id="feed-preview"></div>
+          </div>
+        </div>
+
+        <!-- Donut -->
+        <div>
+          <div class="sec-head">
+            <div class="sec-title">Sentiment Split</div>
+          </div>
+          <div class="donut-card">
+            <div class="donut-wrap">
+              <svg id="donut-svg" width="140" height="140" viewBox="0 0 140 140">
+                <circle cx="70" cy="70" r="52" fill="none" stroke="#1f1f23" stroke-width="18"/>
+                <circle id="d-pos" cx="70" cy="70" r="52" fill="none" stroke="#22c55e" stroke-width="18"
+                  stroke-dasharray="0 327" stroke-dashoffset="82" stroke-linecap="butt"
+                  style="transition:stroke-dasharray .8s ease" transform="rotate(-90 70 70)"/>
+                <circle id="d-neu" cx="70" cy="70" r="52" fill="none" stroke="#3f3f46" stroke-width="18"
+                  stroke-dasharray="0 327" stroke-dashoffset="82" stroke-linecap="butt"
+                  style="transition:stroke-dasharray .8s ease" transform="rotate(-90 70 70)"/>
+                <circle id="d-neg" cx="70" cy="70" r="52" fill="none" stroke="#ef4444" stroke-width="18"
+                  stroke-dasharray="0 327" stroke-dashoffset="82" stroke-linecap="butt"
+                  style="transition:stroke-dasharray .8s ease" transform="rotate(-90 70 70)"/>
+                <text x="70" y="66" text-anchor="middle" font-family="Geist,sans-serif" font-size="20" font-weight="700" fill="#fafafa" id="d-pct">0%</text>
+                <text x="70" y="82" text-anchor="middle" font-family="Geist,sans-serif" font-size="10" fill="#52525b">positive</text>
+              </svg>
+            </div>
+            <div class="donut-legend">
+              <div class="dl-item">
+                <div class="dl-dot" style="background:var(--green)"></div>
+                <div class="dl-label">Positive</div>
+                <div class="dl-val" id="dl-pos">0</div>
+                <div class="dl-pct" id="dlp-pos">0%</div>
+              </div>
+              <div class="dl-item">
+                <div class="dl-dot" style="background:var(--border2)"></div>
+                <div class="dl-label">Neutral</div>
+                <div class="dl-val" id="dl-neu">0</div>
+                <div class="dl-pct" id="dlp-neu">0%</div>
+              </div>
+              <div class="dl-item">
+                <div class="dl-dot" style="background:var(--red)"></div>
+                <div class="dl-label">Negative</div>
+                <div class="dl-val" id="dl-neg">0</div>
+                <div class="dl-pct" id="dlp-neg">0%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trend bars -->
+      <div class="sec-head">
+        <div class="sec-title">Volume Trend (last 7 days)</div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-bars" id="trend-bars"></div>
+      </div>
+
+    </div><!-- /overview -->
+
+    <!-- ── REVIEWS ── -->
+    <div class="page" id="page-reviews">
+      <div class="sec-head" style="margin-bottom:16px">
+        <div class="sec-title">All Reviews</div>
+        <div style="display:flex;gap:8px">
+          <select id="filter-sent" onchange="renderReviews()" style="background:var(--s2);border:1px solid var(--border);color:var(--t2);border-radius:var(--r-sm);padding:5px 10px;font-size:12px;font-family:'Geist',sans-serif">
+            <option value="all">All sentiment</option>
+            <option value="positive">Positive</option>
+            <option value="neutral">Neutral</option>
+            <option value="negative">Negative</option>
+          </select>
+        </div>
+      </div>
+      <div class="feed">
+        <div class="feed-body" id="reviews-list" style="max-height:calc(100vh - 200px)"></div>
+      </div>
+    </div>
+
+    <!-- ── ANALYZE ── -->
+    <div class="page" id="page-analyze">
+      <div class="analyze-grid">
+        <div class="analyze-left">
+          <div class="mode-sel">
+            <button class="ms-opt active" onclick="setMode('fast')">⚡ Fast Model</button>
+            <button class="ms-opt" onclick="setMode('smart')">🧠 Smart Model</button>
+            <button class="ms-opt" onclick="setMode('compare')">↔ Compare</button>
+          </div>
+
+          <div class="input-box">
+            <div class="ib-header">
+              <span class="ib-title">Customer feedback text</span>
+              <span class="ib-source">Manual entry</span>
+            </div>
+            <textarea id="txt" placeholder="Paste a customer review, support ticket, or any feedback text…" oninput="onInput()"></textarea>
+            <div class="ib-footer">
+              <span class="char-ct" id="cc">0 chars</span>
+              <button class="analyze-btn" id="go" onclick="run()">Analyze →</button>
+            </div>
+          </div>
+
+          <div style="margin-bottom:10px;font-size:11px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.08em">Examples</div>
+          <div class="ex-row" id="examps"></div>
+        </div>
+
+        <div id="result-area">
+          <div class="empty" style="padding:60px 0">
+            <div class="empty-icon">⊙</div>
+            <div class="empty-text">Enter text and click Analyze<br>to see model predictions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EMBED ── -->
+    <div class="page" id="page-embed">
+      <div class="embed-card">
+        <h3>Embed the feedback widget</h3>
+        <p>Add this script tag to your website. Customers submit feedback and results are analyzed in real-time and streamed to your PulseCheck dashboard.</p>
+        <div class="code-block">&lt;!-- PulseCheck Widget --&gt;
+&lt;script
+  src="https://cdn.pulsecheck.io/widget.js"
+  data-workspace="acme-corp-xxxx"
+  data-position="bottom-right"
+  data-theme="dark"
+&gt;&lt;/script&gt;</div>
+        <button class="copy-btn" onclick="this.textContent='✓ Copied'">⎘ Copy snippet</button>
+      </div>
+      <div class="embed-card">
+        <h3>REST API</h3>
+        <p>Send feedback programmatically from your backend. Works with any language or framework.</p>
+        <div class="code-block">POST https://api.pulsecheck.io/v1/analyze
+
+{
+  "text": "The product was great but shipping took forever",
+  "model": "smart",
+  "source": "checkout-survey"
+}</div>
+        <button class="copy-btn" onclick="this.textContent='✓ Copied'">⎘ Copy</button>
+      </div>
+      <div class="embed-card">
+        <h3>Webhook</h3>
+        <p>Get notified instantly when a negative review is detected. POST to your endpoint with the full analysis payload.</p>
+        <div class="code-block">{
+  "event": "negative_detected",
+  "confidence": 0.91,
+  "text": "Worst experience I've had...",
+  "source": "product-page",
+  "timestamp": "2025-04-30T09:41:00Z"
+}</div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// ── SEED DATA ──
+const SEED = [
+  {text:"The onboarding was surprisingly smooth. Got everything set up in under 10 minutes.",sent:"positive",conf:.91,source:"onboarding-survey"},
+  {text:"Shipping took 3 weeks. No updates, no tracking. Completely unacceptable.",sent:"negative",conf:.94,source:"post-purchase"},
+  {text:"Product does what it says. Nothing more, nothing less.",sent:"neutral",conf:.72,source:"product-page"},
+  {text:"I've tried every competitor and nothing comes close to this. Genuinely impressed.",sent:"positive",conf:.96,source:"review-form"},
+  {text:"Oh great, another update that broke everything that was already working.",sent:"negative",conf:.71,source:"in-app"},
+  {text:"Support team was helpful and resolved my issue same day.",sent:"positive",conf:.89,source:"support-ticket"},
+  {text:"The pricing is steep but the quality justifies it, I suppose.",sent:"neutral",conf:.61,source:"checkout"},
+  {text:"Never buying from here again. Absolute disaster from start to finish.",sent:"negative",conf:.97,source:"post-purchase"},
+  {text:"A great product for people who don't know any better.",sent:"negative",conf:.68,source:"review-form"},
+  {text:"Clean UI, fast, does the job. Would recommend.",sent:"positive",conf:.88,source:"product-page"},
+  {text:"The feature I was promised at signup still isn't available.",sent:"negative",conf:.83,source:"in-app"},
+  {text:"I've been a customer for 2 years. Consistency is what keeps me here.",sent:"positive",conf:.90,source:"nps-survey"},
+];
+
+let entries = SEED.map((e,i) => ({...e, id:i, time: new Date(Date.now() - (SEED.length-i)*1000*60*7)}));
+let aMode = 'fast';
+
+// ── NAV ──
+const TITLES = {overview:'Overview', reviews:'Reviews', analyze:'Analyze', embed:'Embed Widget'};
+const SUBS   = {overview:'Last 7 days', reviews:'All feedback entries', analyze:'Single text analysis', embed:'Integration options'};
+
+function nav(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  const items = document.querySelectorAll('.sb-item');
+  const map = ['overview','reviews','analyze','embed'];
+  map.forEach((m,i) => { if(m===page) items[i].classList.add('active'); });
+  document.getElementById('tb-title').textContent = TITLES[page]||page;
+  document.getElementById('tb-sub').textContent   = SUBS[page]||'';
+  if(page==='reviews') renderReviews();
+}
+
+// ── MODE ──
+function setMode(m) {
+  aMode = m;
+  document.querySelectorAll('.ms-opt').forEach((o,i) =>
+    o.classList.toggle('active', ['fast','smart','compare'][i]===m)
+  );
+}
+
+// ── STATS ──
+function refreshStats() {
+  const total = entries.length;
+  const pos = entries.filter(e=>e.sent==='positive').length;
+  const neg = entries.filter(e=>e.sent==='negative').length;
+  const neu = entries.filter(e=>e.sent==='neutral').length;
+  const avgConf = entries.reduce((a,e)=>a+e.conf,0)/total;
+
+  document.getElementById('s-total').textContent  = total;
+  document.getElementById('s-total-d').textContent = `↑ ${Math.min(total,5)} this week`;
+  document.getElementById('s-pos').textContent    = Math.round(pos/total*100)+'%';
+  document.getElementById('s-neg').textContent    = Math.round(neg/total*100)+'%';
+  document.getElementById('s-conf').textContent   = Math.round(avgConf*100)+'%';
+  document.getElementById('s-pos-d').innerHTML    = `<span class="delta-up">↑ ${pos} reviews</span>`;
+  document.getElementById('s-neg-d').innerHTML    = `<span class="delta-dn">↓ ${neg} reviews</span>`;
+  document.getElementById('sb-ct').textContent    = total;
+  document.getElementById('feed-ct').textContent  = total+' entries';
+
+  document.getElementById('dl-pos').textContent  = pos;
+  document.getElementById('dl-neu').textContent  = neu;
+  document.getElementById('dl-neg').textContent  = neg;
+  document.getElementById('dlp-pos').textContent = Math.round(pos/total*100)+'%';
+  document.getElementById('dlp-neu').textContent = Math.round(neu/total*100)+'%';
+  document.getElementById('dlp-neg').textContent = Math.round(neg/total*100)+'%';
+
+  updateDonut(pos/total, neu/total, neg/total);
+  renderFeedPreview();
+  renderTrend();
+}
+
+// ── DONUT ──
+const CIRC = 2*Math.PI*52;
+function updateDonut(posR, neuR, negR) {
+  const posArc = posR*CIRC, neuArc = neuR*CIRC, negArc = negR*CIRC;
+  const posOffset = 0, neuOffset = -posArc, negOffset = -(posArc+neuArc);
+  const set = (id,arc,off) => {
+    const el = document.getElementById(id);
+    el.setAttribute('stroke-dasharray',`${arc} ${CIRC-arc}`);
+    el.setAttribute('stroke-dashoffset', off);
+  };
+  set('d-pos',posArc,0);
+  set('d-neu',neuArc,neuOffset);
+  set('d-neg',negArc,negOffset);
+  document.getElementById('d-pct').textContent = Math.round(posR*100)+'%';
+}
+
+// ── FEED ──
+function pillHTML(sent) {
+  const cls = {positive:'sp-pos',negative:'sp-neg',neutral:'sp-neu'}[sent]||'sp-neu';
+  const lbl = {positive:'Positive',negative:'Negative',neutral:'Neutral'}[sent]||sent;
+  return `<span class="sent-pill ${cls}">${lbl}</span>`;
+}
+function timeAgo(d) {
+  const m = Math.floor((Date.now()-d)/60000);
+  if(m<1) return 'just now';
+  if(m<60) return m+'m ago';
+  return Math.floor(m/60)+'h ago';
+}
+function renderFeedPreview() {
+  const el = document.getElementById('feed-preview');
+  const items = [...entries].sort((a,b)=>b.time-a.time).slice(0,6);
+  el.innerHTML = items.map(e=>`
+    <div class="feed-item">
+      <div class="fi-top">
+        <div class="fi-text">${e.text.length>80?e.text.slice(0,80)+'…':e.text}</div>
+        ${pillHTML(e.sent)}
+      </div>
+      <div class="fi-meta">
+        <span class="fi-source">${e.source||'manual'}</span>
+        <span class="fi-conf">${Math.round(e.conf*100)}% conf</span>
+        <span class="fi-time">${timeAgo(e.time)}</span>
+      </div>
+    </div>`).join('');
+}
+function renderReviews() {
+  const filter = document.getElementById('filter-sent').value;
+  const el = document.getElementById('reviews-list');
+  const items = [...entries]
+    .filter(e=>filter==='all'||e.sent===filter)
+    .sort((a,b)=>b.time-a.time);
+  if(!items.length){el.innerHTML='<div class="empty"><div class="empty-icon">◈</div><div class="empty-text">No reviews match this filter</div></div>';return;}
+  el.innerHTML = items.map(e=>`
+    <div class="feed-item">
+      <div class="fi-top">
+        <div class="fi-text">${e.text}</div>
+        ${pillHTML(e.sent)}
+      </div>
+      <div class="fi-meta">
+        <span class="fi-source">${e.source||'manual'}</span>
+        <span class="fi-conf">${Math.round(e.conf*100)}% confidence</span>
+        <span class="fi-time">${timeAgo(e.time)}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ── TREND ──
+function renderTrend() {
+  const el = document.getElementById('trend-bars');
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const counts = [4,7,5,9,8,6,entries.length];
+  const max = Math.max(...counts);
+  el.innerHTML = counts.map((c,i)=>`
+    <div class="t-bar-wrap">
+      <div class="t-bar" style="height:${Math.round(c/max*72)}px;background:${i===6?'var(--blue)':'var(--s3)'}"></div>
+      <div class="t-label">${days[i]}</div>
+    </div>`).join('');
+}
+
+// ── EXAMPLES ──
+const EXAMPLES = [
+  "The product is amazing, changed my workflow completely.",
+  "Oh great, another useless update that breaks everything.",
+  "It arrived on time. Packaging was fine.",
+  "A great movie for those without good taste!",
+  "Support was slow but eventually solved my issue.",
+  "Never again. Absolute waste of money.",
+];
+(function initExamples() {
+  const wrap = document.getElementById('examps');
+  EXAMPLES.forEach(e=>{
+    const b = document.createElement('button');
+    b.className='ex-tag'; b.textContent=e.length>40?e.slice(0,40)+'…':e; b.title=e;
+    b.onclick=()=>{document.getElementById('txt').value=e;onInput();};
+    wrap.appendChild(b);
+  });
+})();
+
+// ── INPUT ──
+function onInput(){
+  const n=document.getElementById('txt').value.length;
+  document.getElementById('cc').textContent=n+' chars';
+}
+
+// ── MOCK CLASSIFY ──
+function mockClassify(text,m){
+  const lower=text.toLowerCase();
+  const posW=['love','great','amazing','excellent','happy','good','best','wonderful','fantastic','awesome','perfect','enjoy','excited','glad','superb','smooth','clean','fast','helpful','impressed'];
+  const negW=['hate','worst','terrible','awful','bad','horrible','waste','disappoint','boring','regret','useless','broken','angry','frustrated','annoyed','dull','disaster','unacceptable','slow','never again'];
+  const SARCASM=[
+    /oh\s+(great|wonderful|fantastic|perfect|amazing)/i,
+    /another\s+(useless|boring|terrible|awful|bad|horrible)/i,
+    /great\s+(for|movie|product)\s+for\s+those\s+(without|who\s+(don't|lack))/i,
+    /just\s+what\s+i\s+(needed|wanted)/i,
+    /yeah\s+right/i,
+    /for\s+(people|those)\s+who\s+don'?t\s+know/i,
+  ];
+  const isSarcastic=SARCASM.some(r=>r.test(lower));
+  let pos=posW.filter(w=>lower.includes(w)).length;
+  let neg=negW.filter(w=>lower.includes(w)).length;
+  if(m==='smart'){
+    if(isSarcastic){neg+=pos+2;pos=0;}
+    if(/\b(but|however|though|unfortunately)\b/.test(lower))pos=Math.max(0,pos-1);
+  }
+  let sentiment,confidence,reasoning;
+  if(pos>neg){
+    sentiment='positive';confidence=Math.min(.70+pos*.05+Math.random()*.05,.97);
+    reasoning=m==='fast'?'Positive keyword signals detected.':'Tone conveys satisfaction and approval.';
+  } else if(neg>pos){
+    sentiment='negative';confidence=Math.min(.70+neg*.05+Math.random()*.05,.97);
+    reasoning=m==='fast'?'Negative keyword signals detected.'
+      :isSarcastic?'Sarcasm detected — positive words used with negative intent.'
+      :'Frustration or dissatisfaction expressed.';
+  } else {
+    sentiment='neutral';confidence=.50+Math.random()*.18;
+    reasoning=m==='fast'?'Mixed signals — below confidence threshold.':'No dominant emotional polarity detected.';
+  }
+  return {sentiment,confidence,reasoning};
+}
+
+async function callAPI(text, m) {
+  // This now calls your real FastAPI backend instead of the mock.
+  // The API runs on your computer at port 8000.
+  const response = await fetch("http://127.0.0.1:8000/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      text: text,
+      mode: m === "compare" ? "smart" : m,
+      source: "dashboard"
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error("API error: " + response.status);
+  }
+
+  const data = await response.json();
+
+  // Your API returns { sentiment, confidence, model, text }
+  // The dashboard expects { sentiment, confidence, reasoning }
+  // So we add a reasoning field based on what came back
+  return {
+    sentiment:  data.sentiment,
+    confidence: data.confidence,
+    reasoning:  `${data.model === "fast" ? "Fast model" : "Smart model"} — ${Math.round(data.confidence * 100)}% confidence. Powered by ${data.model === "fast" ? "TF-IDF + Logistic Regression" : "cardiffnlp/twitter-roberta-base-sentiment"}.`
+  };
+}
+
+// ── RESULT CARD ──
+const EMOJI={positive:'😊',negative:'😠',neutral:'😐'};
+const SI={positive:'si-pos',negative:'si-neg',neutral:'si-neu'};
+const SL={positive:'sl-pos',negative:'sl-neg',neutral:'sl-neu'};
+const BF={positive:'bf-pos',negative:'bf-neg',neutral:'bf-neu'};
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+
+function buildResultCard(r,m){
+  const pct=Math.round(r.confidence*100);
+  const modelCls=m==='fast'?'rbm-fast':'rbm-smart';
+  const modelLbl=m==='fast'?'⚡ Fast':'🧠 Smart';
+  const div=document.createElement('div');
+  div.className='result-box';
+  div.innerHTML=`
+    <div class="rb-head">
+      <span class="rb-label">Analysis</span>
+      <span class="rb-model ${modelCls}">${modelLbl}</span>
+    </div>
+    <div class="rb-body">
+      <div class="big-sent">
+        <div class="sent-ico ${SI[r.sentiment]}">${EMOJI[r.sentiment]}</div>
+        <div>
+          <div class="sent-label ${SL[r.sentiment]}">${cap(r.sentiment)}</div>
+          <div class="sent-pct">${pct}% confidence</div>
+        </div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-labels"><span>confidence</span><span>${pct}%</span></div>
+        <div class="bar-track"><div class="bar-fill ${BF[r.sentiment]}" style="width:${pct}%"></div></div>
+      </div>
+      <div class="reason"><b>Model reasoning:</b> ${r.reasoning}</div>
+    </div>`;
+  return div;
+}
+
+// ── RUN ──
+async function run(){
+  const text=document.getElementById('txt').value.trim();
+  const area=document.getElementById('result-area');
+  area.innerHTML='';
+  if(!text)return;
+  if(text.length<4){area.innerHTML='<div class="acc-note">Please enter at least a few words.</div>';return;}
+
+  const btn=document.getElementById('go');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span>Running…';
+
+  try{
+    if(aMode==='compare'){
+      const [fr,sr]=await Promise.all([callAPI(text,'fast'),callAPI(text,'smart')]);
+      const wrap=document.createElement('div');
+      const grid=document.createElement('div');
+      grid.className='cmp-grid';
+      grid.appendChild(buildResultCard(fr,'fast'));
+      grid.appendChild(buildResultCard(sr,'smart'));
+      wrap.appendChild(grid);
+      if(fr.sentiment!==sr.sentiment){
+        const b=document.createElement('div');
+        b.className='disagree-banner';
+        b.innerHTML=`<b>Models disagree</b> — Fast predicts <b>${fr.sentiment}</b>, Smart predicts <b>${sr.sentiment}</b>. This is expected: transformers understand context and sarcasm that keyword models miss.`;
+        wrap.appendChild(b);
+      }
+      // Accuracy note for sarcasm
+      const lower=text.toLowerCase();
+      if(/great|wonderful|amazing|fantastic/.test(lower)&&/without|don't|lack|boring|bad/.test(lower)){
+        const n=document.createElement('div');
+        n.className='acc-note';
+        n.innerHTML=`<b>Note on accuracy:</b> This text appears sarcastic. No model is 100% accurate — transformers reach ~87% on standard text but drop to ~68% on sarcasm. At scale (1000+ reviews), aggregate trends remain reliable even with individual errors.`;
+        wrap.appendChild(n);
+      }
+      area.appendChild(wrap);
+      entries.unshift({text,sent:sr.sentiment,conf:sr.conf||sr.confidence,source:'manual',time:new Date(),id:Date.now()});
+    } else {
+      const r=await callAPI(text,aMode);
+      area.appendChild(buildResultCard(r,aMode));
+      entries.unshift({text,sent:r.sentiment,conf:r.confidence,source:'manual',time:new Date(),id:Date.now()});
+    }
+    refreshStats();
+  } catch(e){
+    area.innerHTML=`<div class="acc-note">Error: ${e.message}</div>`;
+  }
+  btn.disabled=false;btn.textContent='Analyze →';
+}
+
+// ── INIT ──
+refreshStats();
+(function initExamplesAlready(){})();
+</script>
+</body>
+</html>
