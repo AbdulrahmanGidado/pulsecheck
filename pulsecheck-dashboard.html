@@ -736,23 +736,8 @@ textarea::placeholder{color:var(--t4)}
 </div><!-- /main -->
 
 <script>
-// ── SEED DATA ──
-const SEED = [
-  {text:"The onboarding was surprisingly smooth. Got everything set up in under 10 minutes.",sent:"positive",conf:.91,source:"onboarding-survey"},
-  {text:"Shipping took 3 weeks. No updates, no tracking. Completely unacceptable.",sent:"negative",conf:.94,source:"post-purchase"},
-  {text:"Product does what it says. Nothing more, nothing less.",sent:"neutral",conf:.72,source:"product-page"},
-  {text:"I've tried every competitor and nothing comes close to this. Genuinely impressed.",sent:"positive",conf:.96,source:"review-form"},
-  {text:"Oh great, another update that broke everything that was already working.",sent:"negative",conf:.71,source:"in-app"},
-  {text:"Support team was helpful and resolved my issue same day.",sent:"positive",conf:.89,source:"support-ticket"},
-  {text:"The pricing is steep but the quality justifies it, I suppose.",sent:"neutral",conf:.61,source:"checkout"},
-  {text:"Never buying from here again. Absolute disaster from start to finish.",sent:"negative",conf:.97,source:"post-purchase"},
-  {text:"A great product for people who don't know any better.",sent:"negative",conf:.68,source:"review-form"},
-  {text:"Clean UI, fast, does the job. Would recommend.",sent:"positive",conf:.88,source:"product-page"},
-  {text:"The feature I was promised at signup still isn't available.",sent:"negative",conf:.83,source:"in-app"},
-  {text:"I've been a customer for 2 years. Consistency is what keeps me here.",sent:"positive",conf:.90,source:"nps-survey"},
-];
 
-let entries = SEED.map((e,i) => ({...e, id:i, time: new Date(Date.now() - (SEED.length-i)*1000*60*7)}));
+let entries = [];
 let aMode = 'fast';
 
 // ── NAV ──
@@ -1061,7 +1046,27 @@ async function run(){
 }
 
 // ── INIT ──
-refreshStats();
+// Load real reviews from Supabase on page load
+async function loadReviews() {
+  try {
+    const res  = await fetch("https://web-production-14e27a.up.railway.app/reviews");
+    const data = await res.json();
+    entries = data.reviews.map(r => ({
+      text:      r.text,
+      sent:      r.sentiment,
+      conf:      r.confidence,
+      source:    r.source || "manual",
+      time:      new Date(r.created_at),
+      id:        r.id,
+    }));
+    refreshStats();
+  } catch(e) {
+    console.error("Failed to load reviews:", e);
+    refreshStats();
+  }
+}
+
+loadReviews();
 (function initExamplesAlready(){})();
 </script>
 </body>
