@@ -117,3 +117,19 @@ def analyze(req: AnalyzeRequest):
         print(f"Supabase insert failed: {e}")
 
     return result
+
+# ── FETCH REVIEWS ──
+# This endpoint retrieves all saved analyses from Supabase.
+# The dashboard calls this on load to populate the Reviews page.
+@app.get("/reviews")
+def get_reviews():
+    try:
+        response = supabase.table("feedback")\
+            .select("*")\
+            .order("created_at", desc=True)\
+            .limit(100)\
+            .execute()
+        return {"reviews": response.data}
+    except Exception as e:
+        print(f"Supabase fetch failed: {e}")
+        return {"reviews": []}
