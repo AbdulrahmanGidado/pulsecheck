@@ -951,7 +951,7 @@ function mockClassify(text,m){
 async function callAPI(text, m) {
   // This now calls your real FastAPI backend instead of the mock.
   // The API runs on your computer at port 8000.
-  const response = await fetch("http://127.0.0.1:8000/analyze", {
+  const response = await fetch("https://web-production-14e27a.up.railway.app/analyze", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
