@@ -6,3 +6,4 @@ transformers
 torch
 python-multipart
 numpy
+supabase
